@@ -1,5 +1,5 @@
 import React, { Component, Suspense } from 'react';
-import { BrowserRouter, Route, NavLink } from 'react-router-dom';
+import { BrowserRouter, Route, NavLink, Redirect } from 'react-router-dom';
 
 import User from './containers/User';
 import Welcome from './containers/Welcome';
@@ -9,7 +9,8 @@ const Posts=React.lazy(()=>import('./containers/Posts'));
 
 class App extends Component {
   state={
-    show:false
+    show:false,
+    authenticated:true
   }
 
   modeHandler=()=>{
@@ -20,15 +21,19 @@ class App extends Component {
 
   render() {
     return (
-      <BrowserRouter>
+      <BrowserRouter basename="/my-app">
         <React.Fragment>
           <nav>
             <NavLink to="/">Home</NavLink> |&nbsp;
             <NavLink to="/user">User Page</NavLink> |&nbsp;
             <NavLink to="/posts">Posts Page</NavLink>
           </nav>
+
           <Route path="/" component={Welcome} exact />
-          <Route path="/user" component={User} />
+
+          {/*<Route path="/user" component={User} exact />*/}
+          <Route path="/user" render={()=>{ return this.state.authenticated? <User />:  <Redirect to="/"/> }} />
+
           <Route path="/posts" render={()=><Suspense fallback={<div>Loading..</div>}><Posts /></Suspense>} />
 
           <button onClick={this.modeHandler}>Show Posts</button>
